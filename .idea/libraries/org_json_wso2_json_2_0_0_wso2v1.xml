@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="org.json.wso2:json:2.0.0.wso2v1" type="repository">
+    <properties maven-id="org.json.wso2:json:2.0.0.wso2v1" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/json/wso2/json/2.0.0.wso2v1/json-2.0.0.wso2v1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
