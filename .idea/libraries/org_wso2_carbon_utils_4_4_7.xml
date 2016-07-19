@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="org.wso2.carbon.utils_4.4.7">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../wso2cep-4.2.0-SNAPSHOT/repository/components/plugins/org.wso2.carbon.utils_4.4.7.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
