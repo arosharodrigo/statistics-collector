@@ -1,4 +1,5 @@
 package research.schedular.eventreceiver;
+
 /*
  * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -33,10 +34,14 @@ import org.wso2.carbon.databridge.receiver.binary.internal.BinaryDataReceiver;
 import org.wso2.carbon.databridge.receiver.thrift.ThriftDataReceiver;
 import org.wso2.carbon.user.api.UserStoreException;
 import research.schedular.Util;
+import research.schedular.kslack.SimpleKslack;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class WSO2EventReceiver {
     Logger log = Logger.getLogger(WSO2EventReceiver.class);
@@ -46,32 +51,70 @@ public class WSO2EventReceiver {
     static final WSO2EventReceiver testServer = new WSO2EventReceiver();
     int totalCount = 0;
     AtomicInteger count = new AtomicInteger(0);
+    List<Double> latencyValues = new ArrayList<Double>();
+
+    Lock latencyValuesLock = new ReentrantLock();
     final static double BATCH_SIZE = 10000.0;
+
+    SimpleKslack kslack = new SimpleKslack(this);
+    private boolean isUsingKslack = true;
+
+    private long lastTimeStamp = 0;
+    private long outOfOrderEventCount = 0;
+    private long nonOutOfOrderEventCount = 0;
+
 
     public static WSO2EventReceiver getInstance(){
         return testServer;
     }
 
-    /*
-    public static void main(String[] args) throws DataBridgeException, StreamDefinitionStoreException {
-        testServer.start("0.0.0.0", 7661, "thrift", "");
-        synchronized (testServer) {
-            try {
-                testServer.wait();
-            } catch (InterruptedException ignored) {
+    public int getAndResetCount(){
+        int value = count.get();
+        count.set(0);
+        return value;
+    }
+
+    public double[] getAndResetLatencyValues(){
+        latencyValuesLock.lock();
+        double[] values = new double[latencyValues.size()];
 
 
+        for (int i = 0; i < latencyValues.size(); i++){
+            values[i] = latencyValues.get(i);
+        }
+        latencyValues.clear();
+        latencyValuesLock.unlock();
+
+        return values;
+    }
+
+    public void onReceive(List<Event> eventList){
+        totalCount += eventList.size();
+        count.set(count.get() + eventList.size());
+        latencyValuesLock.lock();
+        for (Event event : eventList){
+            latencyValues.add((double) (System.currentTimeMillis() - event.getTimeStamp()));
+            checkOutOfOrder(event.getTimeStamp());
+        }
+
+        latencyValuesLock.unlock();
+    }
+
+    public void checkOutOfOrder(long timestamp){
+        if (lastTimeStamp == 0){
+            lastTimeStamp = timestamp;
+        } else {
+            if (timestamp < lastTimeStamp){
+                outOfOrderEventCount++;
+                System.out.println("Out of order event[Lsat timestamp=" + lastTimeStamp + " , thisTimeStamp="
+                        + timestamp + ", Count=" + outOfOrderEventCount + ", Non count=" + nonOutOfOrderEventCount+ "]");
+            } else {
+                nonOutOfOrderEventCount++;
+                lastTimeStamp = timestamp;
             }
         }
-    }*/
-
-    public int getCount(){
-        return count.get();
     }
 
-    public void resetCount(){
-        count.set(0);
-    }
 
     public void start(String host, int receiverPort, String protocol, String sampleNumber) throws DataBridgeException, StreamDefinitionStoreException {
         Util.setKeyStoreParams();
@@ -79,8 +122,6 @@ public class WSO2EventReceiver {
             public boolean authenticate(String userName,
                                         String password) {
                 return true;// allays authenticate to true
-
-
             }
 
             public String getTenantDomain(String userName) {
@@ -121,13 +162,12 @@ public class WSO2EventReceiver {
             }
 
             public void receive(List<Event> eventList, Credentials credentials) {
-                totalCount++;
-                count.incrementAndGet();
-                //if (totalCount % BATCH_SIZE == 0){
-                //    log.info("Total Event Received : " + totalCount);
-                //}
+                if (isUsingKslack) {
+                    kslack.addEvents(eventList);
+                } else {
+                    onReceive(eventList);
+                }
             }
-
 
         });
 
