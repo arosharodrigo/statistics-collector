@@ -32,8 +32,8 @@ import java.util.List;
 public class Util {
     private static Log log = LogFactory.getLog(Util.class);
 
-    static String baseFilePath =   "/home/arosha/projects/Siddhi/projects/start-2017-06-19/Homomorphic/projects/ESM/statistics-collector/";
-    static String pseudoCarbonHome = "/home/arosha/projects/Siddhi/projects/start-2017-06-19/Homomorphic/projects/ESM/statistics-collector/src/main/java/files";
+    static String baseFilePath =   "/home/arosha/projects/Siddhi/projects/start-2017-06-19/Homomorphic/projects/my-git/statistics-collector/";
+    static String pseudoCarbonHome = "/home/arosha/projects/Siddhi/projects/start-2017-06-19/Homomorphic/projects/my-git/statistics-collector/src/main/java/files";
     static File configFiles = new File(baseFilePath + File.separator + "src/main/java/files/configs");
     static File streamDefinitionFile = new File(baseFilePath+ File.separator + "src/main/java/files/streamDefinitions");
     static PrintWriter writer = null;
