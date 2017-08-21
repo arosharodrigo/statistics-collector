@@ -15,7 +15,7 @@ import java.util.TimerTask;
 // mvn exec:java -Dexec.mainClass="research.schedular.StatisticsCollector"
 public class StatisticsCollector {
 
-    private static final int SAMPLE_RATE = 10000; // How often we read the statistics in milliseconds
+    private static final int SAMPLE_RATE = 1000; // How often we read the statistics in milliseconds
     private static int sampleCount = 0;
     private static DecimalFormat decimalFormat = new DecimalFormat("#.00");
     private static final String RESULT_OUTPUT_FORMAT = "Time Elapsed(s), Load Average, Free Memory Percentage, Throughput(TPS), Avg. Latency(ms), Latency 95th Percentile";

@@ -57,7 +57,7 @@ public class WSO2EventReceiver {
     final static double BATCH_SIZE = 10000.0;
 
     SimpleKslack kslack = new SimpleKslack(this);
-    private boolean isUsingKslack = true;
+    private boolean isUsingKslack = false;
 
     private long lastTimeStamp = 0;
     private long outOfOrderEventCount = 0;
@@ -69,8 +69,7 @@ public class WSO2EventReceiver {
     }
 
     public int getAndResetCount(){
-        int value = count.get();
-        count.set(0);
+        int value = count.getAndSet(0);
         return value;
     }
 
@@ -90,11 +89,11 @@ public class WSO2EventReceiver {
 
     public void onReceive(List<Event> eventList){
         totalCount += eventList.size();
-        count.set(count.get() + eventList.size());
+        count.addAndGet(eventList.size());
         latencyValuesLock.lock();
         for (Event event : eventList){
             latencyValues.add((double) (System.currentTimeMillis() - event.getTimeStamp()));
-            checkOutOfOrder(event.getTimeStamp());
+//            checkOutOfOrder(event.getTimeStamp());
         }
 
         latencyValuesLock.unlock();
