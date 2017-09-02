@@ -7,8 +7,11 @@ import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
 import research.schedular.eventreceiver.WSO2EventReceiver;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.text.DecimalFormat;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -19,9 +22,30 @@ public class StatisticsCollector {
     private static int sampleCount = 0;
     private static DecimalFormat decimalFormat = new DecimalFormat("#.00");
     private static final String RESULT_OUTPUT_FORMAT = "Time Elapsed(s), Load Average, Free Memory Percentage, Throughput(TPS), Avg. Latency(ms), Latency 95th Percentile";
+    private static Properties prop;
 
+    private static void loadProperties() {
+        prop = new Properties();
+        InputStream input = null;
+        try {
+            String filename = "config.properties";
+            input = StatisticsCollector.class.getClassLoader().getResourceAsStream(filename);
+            prop.load(input);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally{
+            if(input!=null){
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
     public static void main(String[] args) throws InterruptedException, DataBridgeException, StreamDefinitionStoreException, FileNotFoundException {
+        loadProperties();
 
         // To avoid exception xml parsing error occur for java 8
         System.setProperty("org.xml.sax.driver", "com.sun.org.apache.xerces.internal.parsers.SAXParser");
@@ -52,7 +76,7 @@ public class StatisticsCollector {
         public void run() {
             synchronized (receiver){
                 try {
-                    receiver.start("0.0.0.0", 7661, "thrift", "");
+                    receiver.start("0.0.0.0", 7661, prop.getProperty("protocol"), "");
                     receiver.wait();
                 } catch (Throwable e) {
                     e.printStackTrace();
