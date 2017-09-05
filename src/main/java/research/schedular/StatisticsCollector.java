@@ -2,8 +2,8 @@ package research.schedular;
 
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.rank.Percentile;
-import org.wso2.carbon.databridge.core.exception.DataBridgeException;
-import org.wso2.carbon.databridge.core.exception.StreamDefinitionStoreException;
+import org.tanukisoftware.wrapper.WrapperListener;
+import org.tanukisoftware.wrapper.WrapperManager;
 import research.schedular.eventreceiver.WSO2EventReceiver;
 
 import java.io.FileNotFoundException;
@@ -16,7 +16,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 // mvn exec:java -Dexec.mainClass="research.schedular.StatisticsCollector"
-public class StatisticsCollector {
+public class StatisticsCollector implements WrapperListener {
 
     private static final int SAMPLE_RATE = 1000; // How often we read the statistics in milliseconds
     private static int sampleCount = 0;
@@ -44,7 +44,19 @@ public class StatisticsCollector {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException, DataBridgeException, StreamDefinitionStoreException, FileNotFoundException {
+    public static void main(String[] args) throws Exception {
+        WrapperManager.start(new StatisticsCollector(), args);
+    }
+
+    public static void startCollecting(){
+        Timer statisticsCollectingTimer = new Timer();
+        statisticsCollectingTimer.schedule(new StatisticsCollectorTask(), 0, SAMPLE_RATE);
+    }
+
+    public Integer start(String[] strings) {
+        System.out.println("=================================================================================");
+        System.out.println("==========================Starting Statistics Collector==========================");
+        System.out.println("=================================================================================");
         loadProperties();
 
         // To avoid exception xml parsing error occur for java 8
@@ -58,13 +70,24 @@ public class StatisticsCollector {
 
         new EventReceiverThread().start();
 
-        Util.initializeResultFile(RESULT_OUTPUT_FORMAT);
+        try {
+            Util.initializeResultFile(RESULT_OUTPUT_FORMAT);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         StatisticsCollector.startCollecting();
+        return null;
     }
 
-    public static void startCollecting(){
-        Timer statisticsCollectingTimer = new Timer();
-        statisticsCollectingTimer.schedule(new StatisticsCollectorTask(), 0, SAMPLE_RATE);
+    public int stop(int i) {
+        System.out.println("=================================================================================");
+        System.out.println("==========================Stopping Statistics Collector==========================");
+        System.out.println("=================================================================================");
+        return 0;
+    }
+
+    public void controlEvent(int i) {
+
     }
 
     /**
