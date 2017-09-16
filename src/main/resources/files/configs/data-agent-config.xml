@@ -45,7 +45,7 @@
         <DataEndpointClass>org.wso2.carbon.databridge.agent.endpoint.thrift.ThriftDataEndpoint</DataEndpointClass>
         <!--<TrustSore>src/test/resources/client-truststore.jks</TrustSore>-->
         <!--<TrustSorePassword>wso2carbon</TrustSorePassword>-->
-        <QueueSize>32768</QueueSize>
+        <QueueSize>128</QueueSize>
         <BatchSize>1000</BatchSize>
         <CorePoolSize>1</CorePoolSize>
         <SocketTimeoutMS>30000</SocketTimeoutMS>
@@ -90,7 +90,7 @@
         <DataEndpointClass>org.wso2.carbon.databridge.agent.endpoint.binary.BinaryDataEndpoint</DataEndpointClass>
         <!--<TrustSore>src/test/resources/client-truststore.jks</TrustSore>-->
         <!--<TrustSorePassword>wso2carbon</TrustSorePassword>-->
-        <QueueSize>32768</QueueSize>
+        <QueueSize>128</QueueSize>
         <BatchSize>200</BatchSize>
         <CorePoolSize>1</CorePoolSize>
         <MaxPoolSize>1</MaxPoolSize>
