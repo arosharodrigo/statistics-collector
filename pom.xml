@@ -183,6 +183,10 @@
                                             <value>1024</value>
                                         </property>
                                         <property>
+                                            <name>wrapper.java.library.path.2</name>
+                                            <value>/home/arosha/projects/Siddhi/projects/start-2017-06-19/Homomorphic/projects/other/HELIB/HElib/helib/src/api</value>
+                                        </property>
+                                        <property>
                                             <name>wrapper.java.additional.1</name>
                                             <value>-Xloggc:logs/gclog</value>
                                         </property>
