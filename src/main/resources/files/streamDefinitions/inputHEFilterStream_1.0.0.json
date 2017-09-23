@@ -5,11 +5,15 @@
   "description": "",
   "payloadData": [
     {
-      "name": "iij_timestamp",
-      "type": "LONG"
+      "name": "timestampList",
+      "type": "String"
     },
     {
-      "name": "value",
+      "name": "valueList",
+      "type": "String"
+    },
+    {
+      "name": "size",
       "type": "String"
     }
   ]

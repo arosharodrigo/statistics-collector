@@ -33,6 +33,8 @@ import org.wso2.carbon.databridge.receiver.binary.conf.BinaryDataReceiverConfigu
 import org.wso2.carbon.databridge.receiver.binary.internal.BinaryDataReceiver;
 import org.wso2.carbon.databridge.receiver.thrift.ThriftDataReceiver;
 import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.siddhi.extension.he.api.HomomorphicEncDecService;
+import research.schedular.StatisticsCollector;
 import research.schedular.Util;
 import research.schedular.kslack.SimpleKslack;
 
@@ -64,6 +66,8 @@ public class WSO2EventReceiver {
     private long nonOutOfOrderEventCount = 0;
 
 
+    public static HomomorphicEncDecService homomorphicEncDecService;
+
     public static WSO2EventReceiver getInstance(){
         return testServer;
     }
@@ -87,7 +91,29 @@ public class WSO2EventReceiver {
         return values;
     }
 
-    public void onReceive(List<Event> eventList){
+    public void onReceive(List<Event> mixEventList){
+        List<Event> eventList = new ArrayList<Event>();
+        for (Event event : mixEventList) {
+            if(event.getPayloadData().length > 2) {
+                Event inEventComposite = event;
+                Object[] payloadData = inEventComposite.getPayloadData();
+                int eventSize = Integer.parseInt(String.valueOf(payloadData[2]));
+                String encryptedResult = String.valueOf(payloadData[1]);
+                String decryptedResult = homomorphicEncDecService.decryptLongVector(encryptedResult);
+
+                String[] timestampArray = String.valueOf(payloadData[0]).split(",");
+                String[] decryptedResultArray = decryptedResult.split(",");
+
+//                Event[] decryptedEvents = new Event[eventSize];
+                for(int i = 0;i < eventSize; i++) {
+                    Event decryptedEvent = new Event("", inEventComposite.getTimeStamp(), null, null, new Object[]{timestampArray[i], decryptedResultArray[i]});
+                    eventList.add(decryptedEvent);
+                }
+            } else {
+                eventList.add(event);
+            }
+        }
+
         totalCount += eventList.size();
         count.addAndGet(eventList.size());
         latencyValuesLock.lock();
@@ -181,6 +207,10 @@ public class WSO2EventReceiver {
             thriftDataReceiver = new ThriftDataReceiver(receiverPort, databridge);
             thriftDataReceiver.start(host);
         }
+
+        homomorphicEncDecService = new HomomorphicEncDecService();
+        homomorphicEncDecService.init(StatisticsCollector.prop.getProperty("key.file.path"));
+
         log.info("Test Server Started");
     }
 

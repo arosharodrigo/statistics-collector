@@ -22,7 +22,7 @@ public class StatisticsCollector implements WrapperListener {
     private static int sampleCount = 0;
     private static DecimalFormat decimalFormat = new DecimalFormat("#.00");
     private static final String RESULT_OUTPUT_FORMAT = "Time Elapsed(s), Load Average, Free Memory Percentage, Throughput(TPS), Avg. Latency(ms), Latency 95th Percentile";
-    private static Properties prop;
+    public static Properties prop;
 
     private static void loadProperties() {
         prop = new Properties();
