@@ -204,7 +204,7 @@ public class WSO2EventReceiver {
                 log.error("Error occurred when reading the file : " + e.getMessage(), e);
             }
         } else {
-            thriftDataReceiver = new ThriftDataReceiver(receiverPort, databridge);
+            thriftDataReceiver = new ThriftDataReceiver(receiverPort + 100, receiverPort, databridge);
             thriftDataReceiver.start(host);
         }
 
