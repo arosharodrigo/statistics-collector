@@ -94,19 +94,21 @@ public class WSO2EventReceiver {
     public void onReceive(List<Event> mixEventList){
         List<Event> eventList = new ArrayList<Event>();
         for (Event event : mixEventList) {
+//            log.info("Event received [" + mixEventList + "]");
             if(event.getPayloadData().length > 2) {
                 Event inEventComposite = event;
                 Object[] payloadData = inEventComposite.getPayloadData();
                 int eventSize = Integer.parseInt(String.valueOf(payloadData[2]));
                 String encryptedResult = String.valueOf(payloadData[1]);
-                String decryptedResult = homomorphicEncDecService.decryptLongVector(encryptedResult);
+//                String decryptedResult = homomorphicEncDecService.decryptLongVector(encryptedResult);
 
                 String[] timestampArray = String.valueOf(payloadData[0]).split(",");
-                String[] decryptedResultArray = decryptedResult.split(",");
+//                String[] decryptedResultArray = decryptedResult.split(",");
 
 //                Event[] decryptedEvents = new Event[eventSize];
                 for(int i = 0;i < eventSize; i++) {
-                    Event decryptedEvent = new Event("", inEventComposite.getTimeStamp(), null, null, new Object[]{timestampArray[i], decryptedResultArray[i]});
+//                    Event decryptedEvent = new Event("", inEventComposite.getTimeStamp(), null, null, new Object[]{timestampArray[i], decryptedResultArray[i]});
+                    Event decryptedEvent = new Event("", Long.valueOf(timestampArray[i]), null, null, new Object[]{timestampArray[i], "0"});
                     eventList.add(decryptedEvent);
                 }
             } else {
