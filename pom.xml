@@ -119,8 +119,8 @@
                     <showConsoleWindow>true</showConsoleWindow>
                     <configurationDirectory>conf</configurationDirectory>
                     <defaultJvmSettings>
-                        <initialMemorySize>1024M</initialMemorySize>
-                        <maxMemorySize>1024M</maxMemorySize>
+                        <initialMemorySize>512M</initialMemorySize>
+                        <maxMemorySize>512M</maxMemorySize>
                     </defaultJvmSettings>
                     <daemons>
                         <daemon>
@@ -176,11 +176,11 @@
                                         </property>
                                         <property>
                                             <name>wrapper.java.initmemory</name>
-                                            <value>2048</value>
+                                            <value>512</value>
                                         </property>
                                         <property>
                                             <name>wrapper.java.maxmemory</name>
-                                            <value>2048</value>
+                                            <value>512</value>
                                         </property>
                                         <property>
                                             <name>wrapper.java.library.path.2</name>
