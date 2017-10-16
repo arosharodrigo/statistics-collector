@@ -21,7 +21,7 @@ public class StatisticsCollector implements WrapperListener {
     private static final int SAMPLE_RATE = 1000; // How often we read the statistics in milliseconds
     private static int sampleCount = 0;
     private static DecimalFormat decimalFormat = new DecimalFormat("#.00");
-    private static final String RESULT_OUTPUT_FORMAT = "Time Elapsed(s), Load Average, Free Memory Percentage, Throughput(TPS), Avg. Latency(ms), Latency 95th Percentile";
+    private static final String RESULT_OUTPUT_FORMAT = "Time Elapsed(s), Load Average, Free Memory Percentage, Throughput(TPS), Avg. Latency(ms), Latency 95th Percentile, Avg. HE Latency(ms), HE Latency 95th Percentile";
     public static Properties prop;
 
     private static void loadProperties() {
@@ -116,6 +116,10 @@ public class StatisticsCollector implements WrapperListener {
             return receiver.getAndResetLatencyValues();
         }
 
+        public static double[] getHeLatencyValues(){
+            return receiver.getAndResetHeLatencyValues();
+        }
+
     }
 
     /**
@@ -133,6 +137,7 @@ public class StatisticsCollector implements WrapperListener {
             sampleCount++;
             int relievedEventCount = EventReceiverThread.getReceivedEventCount();
             double [] latencyValue = EventReceiverThread.getLatencyValues();
+            double [] heLatencyValue = EventReceiverThread.getHeLatencyValues();
 
             StringBuilder result = new StringBuilder();
             result.append(sampleCount * SAMPLE_RATE/1000);// Time Elapsed
@@ -151,6 +156,16 @@ public class StatisticsCollector implements WrapperListener {
                 result.append(decimalFormat.format(new Mean().evaluate(latencyValue, 0, latencyValue.length)));// Latency
                 result.append(",");
                 result.append(decimalFormat.format(new Percentile().evaluate(latencyValue, 95.0))); // 95th Percentile
+            }
+            result.append(",");
+            if (heLatencyValue.length == 0 || relievedEventCount == 0){
+                result.append("0.0");// Latency
+                result.append(",");
+                result.append("0.0"); // 95th Percentile
+            }else {
+                result.append(decimalFormat.format(new Mean().evaluate(heLatencyValue, 0, heLatencyValue.length)));// Latency
+                result.append(",");
+                result.append(decimalFormat.format(new Percentile().evaluate(heLatencyValue, 95.0))); // 95th Percentile
             }
 
             System.out.println(RESULT_OUTPUT_FORMAT + " \n " + result.toString());

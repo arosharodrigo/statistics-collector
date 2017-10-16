@@ -54,8 +54,10 @@ public class WSO2EventReceiver {
     int totalCount = 0;
     AtomicInteger count = new AtomicInteger(0);
     List<Double> latencyValues = new ArrayList<Double>();
+    List<Double> heLatencyValues = new ArrayList<Double>();
 
     Lock latencyValuesLock = new ReentrantLock();
+    Lock heLatencyValuesLock = new ReentrantLock();
     final static double BATCH_SIZE = 10000.0;
 
     SimpleKslack kslack = new SimpleKslack(this);
@@ -91,20 +93,34 @@ public class WSO2EventReceiver {
         return values;
     }
 
-    public void onReceive(List<Event> mixEventList){
-        List<Event> eventList = new ArrayList<Event>();
-        for (Event event : mixEventList) {
-            eventList.add(event);
-        }
+    public double[] getAndResetHeLatencyValues(){
+        heLatencyValuesLock.lock();
+        double[] values = new double[heLatencyValues.size()];
 
+
+        for (int i = 0; i < heLatencyValues.size(); i++){
+            values[i] = heLatencyValues.get(i);
+        }
+        heLatencyValues.clear();
+        heLatencyValuesLock.unlock();
+
+        return values;
+    }
+
+    public void onReceive(List<Event> eventList){
         totalCount += eventList.size();
         count.addAndGet(eventList.size());
         latencyValuesLock.lock();
+        heLatencyValuesLock.lock();
         for (Event event : eventList){
-            latencyValues.add((double) (System.currentTimeMillis() - event.getTimeStamp()));
+            double latency = (System.currentTimeMillis() - event.getTimeStamp());
+            latencyValues.add(latency);
+            if(event.getStreamId().contains("outputHEEmailsStream")) {
+                heLatencyValues.add(latency);
+            }
 //            checkOutOfOrder(event.getTimeStamp());
         }
-
+        heLatencyValuesLock.unlock();
         latencyValuesLock.unlock();
     }
 
