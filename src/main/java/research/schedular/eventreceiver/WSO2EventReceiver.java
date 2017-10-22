@@ -51,14 +51,12 @@ public class WSO2EventReceiver {
     BinaryDataReceiver binaryDataReceiver;
     AbstractStreamDefinitionStore streamDefinitionStore = new InMemoryStreamDefinitionStore();
     static final WSO2EventReceiver testServer = new WSO2EventReceiver();
-    int totalCount = 0;
     AtomicInteger count = new AtomicInteger(0);
     List<Double> latencyValues = new ArrayList<Double>();
     List<Double> heLatencyValues = new ArrayList<Double>();
 
     Lock latencyValuesLock = new ReentrantLock();
     Lock heLatencyValuesLock = new ReentrantLock();
-    final static double BATCH_SIZE = 10000.0;
 
     SimpleKslack kslack = new SimpleKslack(this);
     private boolean isUsingKslack = false;
@@ -67,6 +65,12 @@ public class WSO2EventReceiver {
     private long outOfOrderEventCount = 0;
     private long nonOutOfOrderEventCount = 0;
 
+    private static final String FIELD_SEPARATOR = "###";
+    private static final String COMMA_SEPARATOR = ",";
+
+    private static final int batchSize = 478;
+    private static final int maxEmailLength = 40;
+    private static final int compositeEventSize = 10;
 
     public static HomomorphicEncDecService homomorphicEncDecService;
 
@@ -107,7 +111,7 @@ public class WSO2EventReceiver {
         return values;
     }
 
-    public void onReceive(List<Event> eventList){
+    /*public void onReceive(List<Event> eventList){
         totalCount += eventList.size();
         count.addAndGet(eventList.size());
         latencyValuesLock.lock();
@@ -122,6 +126,90 @@ public class WSO2EventReceiver {
         }
         heLatencyValuesLock.unlock();
         latencyValuesLock.unlock();
+    }*/
+
+    public void onReceive(List<Event> eventList){
+        for (Event event : eventList) {
+            if(event.getStreamId().contains("outputHEEmailsStream")) {
+                try {
+                    List<Event> decodedEvents = new ArrayList<Event>();
+                    Object[] payloadData = event.getPayloadData();
+                    String field1 = (String) payloadData[0];
+                    String[] field1Arr = field1.split(FIELD_SEPARATOR);
+                    String field5 = (String) payloadData[4];
+                    String[] field5Arr = field5.split(FIELD_SEPARATOR);
+                    String field6 = (String) payloadData[5];
+                    String[] field6Arr = field6.split(FIELD_SEPARATOR);
+                    String field7 = (String) payloadData[6];
+                    String[] field7Arr = field7.split(FIELD_SEPARATOR);
+
+                    String field2 = (String) payloadData[1];
+                    String decryptedField2 = homomorphicEncDecService.decryptLongVector(field2);
+                    String[] decryptedField2Arr = decryptedField2.split(COMMA_SEPARATOR);
+
+                    String field3 = (String) payloadData[2];
+                    String decryptedField3 = homomorphicEncDecService.decryptLongVector(field3);
+                    String[] decryptedField3Arr = decryptedField3.split(COMMA_SEPARATOR);
+
+                    String field4 = (String) payloadData[3];
+                    String decryptedField4 = homomorphicEncDecService.decryptLongVector(field4);
+                    String[] decryptedField4Arr = decryptedField4.split(COMMA_SEPARATOR);
+
+                    for(int i = 0; i < compositeEventSize; i++) {
+                        StringBuilder field2Builder = new StringBuilder();
+                        StringBuilder field3Builder = new StringBuilder();
+                        StringBuilder field4Builder = new StringBuilder();
+                        for(int j = 0; j < maxEmailLength; j++) {
+                            field2Builder.append(decryptedField2Arr[(i * maxEmailLength) + j]);
+                            field3Builder.append(decryptedField3Arr[(i * maxEmailLength) + j]);
+                            field4Builder.append(decryptedField4Arr[(i * maxEmailLength) + j]);
+                        }
+
+                        String f5Val = (field5Arr.length > i) ? field5Arr[i] : "";
+                        String f6Val = (field6Arr.length > i) ? field6Arr[i] : "";
+                        String f7Val = (field7Arr.length > i) ? field7Arr[i] : "";
+
+                        Object[] payloadDataArray = {
+                                Long.valueOf(field1Arr[i]),
+                                field2Builder.toString(),
+                                field3Builder.toString(),
+                                field4Builder.toString(),
+                                f5Val,
+                                f6Val,
+                                f7Val
+                        };
+                        Event decodedEvent = new Event(event.getStreamId(), Long.valueOf(field1Arr[i]), null, null, payloadDataArray);
+                        String f2 = field2Builder.toString().replace("0", "");
+                        String f3 = field3Builder.toString().replace("0", "");
+                        String f4 = field4Builder.toString().replace("0", "");
+                        if(f2.isEmpty() && (f3.isEmpty() || f4.isEmpty())) {
+//                            log.info("Filtered out event [" + decodedEvent + "]");
+                        } else {
+                            decodedEvents.add(decodedEvent);
+                        }
+                    }
+                    for(Event decodedEvent: decodedEvents) {
+                        count.incrementAndGet();
+                        double latency = (System.currentTimeMillis() - decodedEvent.getTimeStamp());
+                        latencyValuesLock.lock();
+                        heLatencyValuesLock.lock();
+                        latencyValues.add(latency);
+                        heLatencyValues.add(latency);
+                        heLatencyValuesLock.unlock();
+                        latencyValuesLock.unlock();
+                    }
+                } catch (Throwable th) {
+                    log.error("Error occurred while decoding [" + th + "], Event [" + event + "]");
+                    th.printStackTrace();
+                }
+            } else {
+                count.incrementAndGet();
+                double latency = (System.currentTimeMillis() - event.getTimeStamp());
+                latencyValuesLock.lock();
+                latencyValues.add(latency);
+                latencyValuesLock.unlock();
+            }
+        }
     }
 
     public void checkOutOfOrder(long timestamp){
