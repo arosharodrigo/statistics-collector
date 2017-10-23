@@ -204,7 +204,8 @@ public class WSO2EventReceiver {
                 }
             } else {
                 count.incrementAndGet();
-                double latency = (System.currentTimeMillis() - event.getTimeStamp());
+                Object[] payloadData = event.getPayloadData();
+                double latency = (System.currentTimeMillis() - (Long)payloadData[0]);
                 latencyValuesLock.lock();
                 latencyValues.add(latency);
                 latencyValuesLock.unlock();
