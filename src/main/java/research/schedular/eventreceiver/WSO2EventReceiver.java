@@ -18,6 +18,7 @@ package research.schedular.eventreceiver;
 
 
 import com.google.common.base.Splitter;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.databridge.commons.Credentials;
 import org.wso2.carbon.databridge.commons.Event;
@@ -320,7 +321,7 @@ public class WSO2EventReceiver {
         homomorphicEncDecService = new HomomorphicEncDecService();
         homomorphicEncDecService.init(StatisticsCollector.prop.getProperty("key.file.path"));
 
-        decodingWorkers = Executors.newFixedThreadPool(200);
+        decodingWorkers = Executors.newFixedThreadPool(20, new ThreadFactoryBuilder().setNameFormat("Composite-Event-Decode-Workers").build());
 
         log.info("Test Server Started");
     }
