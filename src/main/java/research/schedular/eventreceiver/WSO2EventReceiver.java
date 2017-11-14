@@ -74,8 +74,14 @@ public class WSO2EventReceiver {
     private static final String COMMA_SEPARATOR = ",";
 
     private static final int batchSize = 478;
+
+    // For Email flow
     private static final int maxEmailLength = 40;
     private static final int compositeEventSize = 10;
+
+    // For EDGAR flow
+    private static final int maxEdgarLength = 20;
+    private static final int compositeEdgarEventSize = 23;
 
     public static HomomorphicEncDecService homomorphicEncDecService;
     private static ExecutorService decodingWorkers;
@@ -298,11 +304,11 @@ public class WSO2EventReceiver {
             Iterator<String> decryptedField9Arr = commaSplitter.split(decryptedField9).iterator();
 
 
-            for(int i = 0; i < compositeEventSize; i++) {
+            for(int i = 0; i < compositeEdgarEventSize; i++) {
                 StringBuilder field3Builder = new StringBuilder();
                 StringBuilder field8Builder = new StringBuilder();
                 StringBuilder field9Builder = new StringBuilder();
-                for(int j = 0; j < maxEmailLength; j++) {
+                for(int j = 0; j < maxEdgarLength; j++) {
                     field3Builder.append(decryptedField3Arr.next());
                     field8Builder.append(decryptedField8Arr.next());
                     field9Builder.append(decryptedField9Arr.next());
