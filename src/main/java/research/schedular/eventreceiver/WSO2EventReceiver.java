@@ -151,6 +151,12 @@ public class WSO2EventReceiver {
                         decodeCompositeEvent(event);
                     }
                 });
+            } else if(event.getStreamId().contains("outputEdgarStream")) {
+                count.incrementAndGet();
+                double latency = (System.currentTimeMillis() - event.getTimeStamp());
+                latencyValuesLock.lock();
+                latencyValues.add(latency);
+                latencyValuesLock.unlock();
             } else if(event.getStreamId().contains("outputHEEdgarStream")) {
                 decodingWorkers.submit(new Runnable() {
                     public void run() {
@@ -346,7 +352,7 @@ public class WSO2EventReceiver {
                         f15Val,
                         f16Val
                 };
-                Event decodedEvent = new Event(event.getStreamId(), Long.valueOf(splitField1), null, null, payloadDataArray);
+                Event decodedEvent = new Event(event.getStreamId(), event.getTimeStamp(), null, null, payloadDataArray);
                 String f3 = field3Builder.toString().replace("0", ""); // Try later: boolean isSatisfiedF2 = field2Builder.toString().equals("0000000000000000000000000000000000000000");
                 String f8 = field8Builder.toString().replace("0", "");
                 String f9 = field9Builder.toString().replace("0", "");
