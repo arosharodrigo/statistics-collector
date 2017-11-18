@@ -124,8 +124,8 @@
                     <showConsoleWindow>true</showConsoleWindow>
                     <configurationDirectory>conf</configurationDirectory>
                     <defaultJvmSettings>
-                        <initialMemorySize>512M</initialMemorySize>
-                        <maxMemorySize>512M</maxMemorySize>
+                        <initialMemorySize>0M</initialMemorySize>
+                        <maxMemorySize>0M</maxMemorySize>
                     </defaultJvmSettings>
                     <daemons>
                         <daemon>
@@ -181,15 +181,15 @@
                                         </property>
                                         <property>
                                             <name>wrapper.java.initmemory</name>
-                                            <value>512</value>
+                                            <value>0</value>
                                         </property>
                                         <property>
                                             <name>wrapper.java.maxmemory</name>
-                                            <value>512</value>
+                                            <value>0</value>
                                         </property>
                                         <property>
                                             <name>wrapper.java.library.path.2</name>
-                                            <value>/home/arosha/projects/Siddhi/projects/start-2017-06-19/Homomorphic/projects/other/HELIB/HElib/helib/src/api</value>
+                                            <value>/home/ubuntu/projects/HElib/helib/src/api</value>
                                         </property>
                                         <property>
                                             <name>wrapper.java.additional.1</name>
@@ -215,16 +215,24 @@
                                             <name>wrapper.java.additional.6</name>
                                             <value>-XX:InitiatingHeapOccupancyPercent=70</value>
                                         </property>
+                                        <property>
+                                            <name>wrapper.java.additional.7</name>
+                                            <value>-Xms8192m</value>
+                                        </property>
+                                        <property>
+                                            <name>wrapper.java.additional.8</name>
+                                            <value>-Xmx8192m</value>
+                                        </property>
                                         <!--<property>-->
-                                            <!--<name>wrapper.java.additional.7</name>-->
+                                            <!--<name>wrapper.java.additional.9</name>-->
                                             <!--<value>-XX:+UnlockCommercialFeatures</value>-->
                                         <!--</property>-->
                                         <!--<property>-->
-                                            <!--<name>wrapper.java.additional.8</name>-->
+                                            <!--<name>wrapper.java.additional.10</name>-->
                                             <!--<value>-XX:+FlightRecorder</value>-->
                                         <!--</property>-->
                                         <!--<property>-->
-                                            <!--<name>wrapper.java.additional.9</name>-->
+                                            <!--<name>wrapper.java.additional.11</name>-->
                                             <!--<value>-XX:StartFlightRecording=duration=600s,filename=logs/statistics-collector.jfr,settings=Heap</value>-->
                                         <!--</property>-->
                                     </configuration>
