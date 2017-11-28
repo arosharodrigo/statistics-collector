@@ -73,7 +73,8 @@ public class WSO2EventReceiver {
     private static final String FIELD_SEPARATOR = "###";
     private static final String COMMA_SEPARATOR = ",";
 
-    private static final int batchSize = 478;
+//    private static final int batchSize = 478;
+    private static final int batchSize = 168;
 
     // For Email flow
     private static final int maxEmailLength = 40;
@@ -160,7 +161,8 @@ public class WSO2EventReceiver {
             } else if(event.getStreamId().contains("outputHEEdgarStream")) {
                 decodingWorkers.submit(new Runnable() {
                     public void run() {
-                        decodeCompositeEventEdgar(event);
+//                        decodeCompositeEventEdgar(event);
+                        decodeCompositeEventEdgar2(event);
                     }
                 });
             } else {
@@ -378,6 +380,146 @@ public class WSO2EventReceiver {
         }
     }
 
+    private void decodeCompositeEventEdgar2(Event event) {
+        try {
+            List<Event> decodedEvents = new ArrayList<Event>();
+            Object[] payloadData = event.getPayloadData();
+
+            String field1 = (String) payloadData[0];
+            Iterator<String> field1Arr = fieldSplitter.split(field1).iterator();
+
+            String field2 = (String) payloadData[1];
+            Iterator<String> field2Arr = fieldSplitter.split(field2).iterator();
+
+            String field3 = (String) payloadData[2];
+            Iterator<String> field3Arr = fieldSplitter.split(field3).iterator();
+
+            String field4 = (String) payloadData[3];
+            Iterator<String> field4Arr = fieldSplitter.split(field4).iterator();
+
+//            String field5 = (String) payloadData[4];
+//            Iterator<String> field5Arr = fieldSplitter.split(field5).iterator();
+
+            String field6 = (String) payloadData[5];
+            Iterator<String> field6Arr = fieldSplitter.split(field6).iterator();
+
+            String field7 = (String) payloadData[6];
+            Iterator<String> field7Arr = fieldSplitter.split(field7).iterator();
+
+            String field8 = (String) payloadData[7];
+            Iterator<String> field8Arr = fieldSplitter.split(field8).iterator();
+
+            String field9 = (String) payloadData[8];
+            Iterator<String> field9Arr = fieldSplitter.split(field9).iterator();
+
+            String field10 = (String) payloadData[9];
+            Iterator<String> field10Arr = fieldSplitter.split(field10).iterator();
+
+            String field11 = (String) payloadData[10];
+            Iterator<String> field11Arr = fieldSplitter.split(field11).iterator();
+
+            String field12 = (String) payloadData[11];
+            Iterator<String> field12Arr = fieldSplitter.split(field12).iterator();
+
+            String field13 = (String) payloadData[12];
+            Iterator<String> field13Arr = fieldSplitter.split(field13).iterator();
+
+//            String field14 = (String) payloadData[13];
+//            Iterator<String> field14Arr = fieldSplitter.split(field14).iterator();
+//
+//            String field15 = (String) payloadData[14];
+//            Iterator<String> field15Arr = fieldSplitter.split(field15).iterator();
+
+            String field16 = (String) payloadData[15];
+            Iterator<String> field16Arr = fieldSplitter.split(field16).iterator();
+
+            String field17 = (String) payloadData[16];
+            Iterator<String> field17Arr = fieldSplitter.split(field17).iterator();
+
+            String field5 = (String) payloadData[4];
+            String decryptedField5 = homomorphicEncDecService.decryptLongVector(field5);
+            Iterator<String> decryptedField5Arr = commaSplitter.split(decryptedField5).iterator();
+
+            String field14 = (String) payloadData[13];
+            String decryptedField14 = homomorphicEncDecService.decryptLongVector(field14);
+            Iterator<String> decryptedField14Arr = commaSplitter.split(decryptedField14).iterator();
+
+            String field15 = (String) payloadData[14];
+            String decryptedField15 = homomorphicEncDecService.decryptLongVector(field15);
+            Iterator<String> decryptedField15Arr = commaSplitter.split(decryptedField15).iterator();
+
+            for(int i = 0; i < batchSize; i++) {
+                StringBuilder field5Builder = new StringBuilder();
+                StringBuilder field14Builder = new StringBuilder();
+                StringBuilder field15Builder = new StringBuilder();
+
+                field5Builder.append(decryptedField5Arr.next());
+                field14Builder.append(decryptedField14Arr.next());
+                field15Builder.append(decryptedField15Arr.next());
+
+                String f2Val = (field2Arr.hasNext()) ? field2Arr.next() : "";
+                String f3Val = (field3Arr.hasNext()) ? field3Arr.next() : "";
+                String f4Val = (field4Arr.hasNext()) ? field4Arr.next() : "";
+                String f5Val = field5Builder.toString();
+                String f6Val = (field6Arr.hasNext()) ? field6Arr.next() : "";
+                String f7Val = (field7Arr.hasNext()) ? field7Arr.next() : "";
+                String f8Val = (field8Arr.hasNext()) ? field8Arr.next() : "";
+                String f9Val = (field9Arr.hasNext()) ? field9Arr.next() : "";
+                String f10Val = (field10Arr.hasNext()) ? field10Arr.next() : "";
+                String f11Val = (field11Arr.hasNext()) ? field11Arr.next() : "";
+                String f12Val = (field12Arr.hasNext()) ? field12Arr.next() : "";
+                String f13Val = (field13Arr.hasNext()) ? field13Arr.next() : "";
+                String f14Val = field14Builder.toString();
+                String f15Val = field15Builder.toString();
+                String f16Val = (field16Arr.hasNext()) ? field16Arr.next() : "";
+                String f17Val = (field17Arr.hasNext()) ? field17Arr.next() : "";
+
+                String splitField1 = field1Arr.next();
+                Object[] payloadDataArray = {
+                        Long.valueOf(splitField1),
+                        f2Val,
+                        f3Val,
+                        f4Val,
+                        f5Val,
+                        f6Val,
+                        f7Val,
+                        f8Val,
+                        f9Val,
+                        f10Val,
+                        f11Val,
+                        f12Val,
+                        f13Val,
+                        f14Val,
+                        f15Val,
+                        f16Val,
+                        f17Val
+                };
+                Event decodedEvent = new Event(event.getStreamId(), event.getTimeStamp(), null, null, payloadDataArray);
+                String f5 = f5Val.replace("1", "");
+                String f14 = f14Val.replace("1", "");
+                String f15 = f15Val.replace("1", "");
+                if(f5.isEmpty() && f14.isEmpty() && f15.isEmpty()) {
+//                            log.info("Filtered out event [" + decodedEvent + "]");
+                } else {
+                    decodedEvents.add(decodedEvent);
+                }
+            }
+            for(Event decodedEvent: decodedEvents) {
+                count.incrementAndGet();
+                double latency = (System.currentTimeMillis() - decodedEvent.getTimeStamp());
+                latencyValuesLock.lock();
+                heLatencyValuesLock.lock();
+                latencyValues.add(latency);
+                heLatencyValues.add(latency);
+                heLatencyValuesLock.unlock();
+                latencyValuesLock.unlock();
+            }
+        } catch (Throwable th) {
+            log.error("Error occurred while decoding [" + th + "], Event [" + event + "]");
+            th.printStackTrace();
+        }
+    }
+
     public void checkOutOfOrder(long timestamp){
         if (lastTimeStamp == 0){
             lastTimeStamp = timestamp;
@@ -462,7 +604,8 @@ public class WSO2EventReceiver {
         }
 
         homomorphicEncDecService = new HomomorphicEncDecService();
-        homomorphicEncDecService.init(StatisticsCollector.prop.getProperty("key.file.path"));
+//        homomorphicEncDecService.init(StatisticsCollector.prop.getProperty("key.file.path"));
+        homomorphicEncDecService.init(StatisticsCollector.prop.getProperty("key.file.path2"));
 
         decodingWorkers = Executors.newFixedThreadPool(20, new ThreadFactoryBuilder().setNameFormat("Composite-Event-Decode-Workers").build());
 
