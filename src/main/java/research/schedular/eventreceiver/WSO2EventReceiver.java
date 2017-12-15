@@ -241,7 +241,7 @@ public class WSO2EventReceiver {
             }
             for(Event decodedEvent: decodedEvents) {
                 count.incrementAndGet();
-                double latency = (System.currentTimeMillis() - decodedEvent.getTimeStamp());
+                double latency = (System.currentTimeMillis() - event.getTimeStamp());
                 latencyValuesLock.lock();
                 heLatencyValuesLock.lock();
                 latencyValues.add(latency);
@@ -604,8 +604,8 @@ public class WSO2EventReceiver {
         }
 
         homomorphicEncDecService = new HomomorphicEncDecService();
-//        homomorphicEncDecService.init(StatisticsCollector.prop.getProperty("key.file.path"));
-        homomorphicEncDecService.init(StatisticsCollector.prop.getProperty("key.file.path2"));
+        homomorphicEncDecService.init(StatisticsCollector.prop.getProperty("key.file.path"));
+//        homomorphicEncDecService.init(StatisticsCollector.prop.getProperty("key.file.path2"));
 
         decodingWorkers = Executors.newFixedThreadPool(20, new ThreadFactoryBuilder().setNameFormat("Composite-Event-Decode-Workers").build());
 
