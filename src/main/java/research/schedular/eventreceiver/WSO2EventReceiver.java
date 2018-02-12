@@ -73,8 +73,9 @@ public class WSO2EventReceiver {
     private static final String FIELD_SEPARATOR = "###";
     private static final String COMMA_SEPARATOR = ",";
 
-    private static final int batchSize = 478;
+//    private static final int batchSize = 478;
 //    private static final int batchSize = 168;
+    private static final int batchSize = 140;
 
     // For Email flow
     private static final int maxEmailLength = 40;
